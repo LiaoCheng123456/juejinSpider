@@ -1,4 +1,7 @@
+import time
+
 import redis
+import requests
 
 
 class redisConnectionPool:
@@ -8,4 +11,3 @@ class redisConnectionPool:
     def getClient(self):
         r = redis.Redis(connection_pool=self.pool)
         return r
-

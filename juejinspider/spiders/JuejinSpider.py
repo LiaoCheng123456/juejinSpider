@@ -5,6 +5,7 @@ import random
 import re
 import time
 
+import requests
 import scrapy
 import tomd
 from juejinspider.item.articleItem import ArticleItem
@@ -52,6 +53,9 @@ class JuejinspiderSpider(scrapy.Spider):
     pages = 1
     # 先读取所有标，存入redis
     def start_requests(self):
+        # 模拟一个获取es数据的方法，如果获取不到就等待一会儿，然后在获取
+        r = requests.get("192.168.136.210:9200")
+
         urls = ['https://gold-tag-ms.juejin.im/v1/tags/type/hot/page/%s/pageSize/40' % (self.pages)]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse, headers=self.headers, dont_filter=True)
@@ -71,7 +75,7 @@ class JuejinspiderSpider(scrapy.Spider):
         if "/user/" in response.url and len(str(response.url).split("/")) == 5:
             yield scrapy.Request(url=response.url, callback=self.userHandle, headers=self.headers, dont_filter=True)
 
-    # 数据存入redis, 检查旧的标签连接里面是否有这个链接，如果没有就放入队列里面,并且将新的链接存入到oldTagList
+    # 数据存入redis
     def insertToRedis(self, response):
         logging.info("insertToRedis，存入标签数据到redis")
         # 标签数据已经读取完,重新装入标签
