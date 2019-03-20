@@ -1,0 +1,55 @@
+version: '2' 
+networks:
+  esnet:
+    external: true
+services:
+  elasticsearch:
+    image: liaocheng/elasticsearch:6.4.0
+    container_name: elasticsearch
+    environment:
+      - network.host=0.0.0.0
+      - http.port=9200
+      - bootstrap.memory_lock=false
+      - bootstrap.system_call_filter=false
+      - cluster.name=elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      esnet:
+       aliases:
+        - elasticsearch 
+  kibana:
+    image: liaocheng/kibana:6.4.0
+    container_name: kibana
+    depends_on:
+      - elasticsearch
+    networks:
+      esnet:
+        aliases:
+          - kibana
+    environment:
+      - SERVER_NAME=kibana
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - XPACK_MONITORING_ENABLED=true
+    ports:
+      - "5601:5601"
+  redis:
+    image: liaocheng/redis:5.0.3
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass 123456
+    networks:
+      esnet:
+        aliases:
+          - redis
+  pythohSpider:
+    image: liaocheng/juejinspider:1.1
+    container_name: pythonSpider
+    networks:
+      - esnet
+    depends_on:
+      - elasticsearch
+      - redis
+    command: scrapy crawl JuejinSpider -s JOBDIR=/code/logs/JuejinSpider
