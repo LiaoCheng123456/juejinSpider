@@ -22,14 +22,15 @@ class ArticlePipelines(object):
     # 添加文档
     def createDocument(self, item):
         body = {
-            "title": item['title'],
-            "content": item['content'],
-            "author": item['author'],
-            "createTime": item['createTime'],
-            "readNum": item['readNum'],
-            "praise": item['praise'],
-            "link": item['link'],
-            "commentNum": item['commentNum']
+            "title"         : item['title'],
+            "content"       : item['content'],
+            "author"        : item['author'],
+            "createTime"    : item['createTime'],
+            "readNum"       : item['readNum'],
+            "praise"        : item['praise'],
+            "link"          : item['link'],
+            "commentNum"    : item['commentNum'],
+            'tags'          : item['tags']
         }
         try:
             self.es.create(index=self.index, doc_type=self.type, id=item["id"], body=body)
@@ -40,8 +41,8 @@ class ArticlePipelines(object):
     def updateDocument(self, item):
         parm = {
             "doc" : {
-                "readNum" : item['readNum'],
-                "praise" : item['praise']
+                "readNum"   : item['readNum'],
+                "praise"    : item['praise']
             }
         }
 

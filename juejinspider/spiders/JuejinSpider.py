@@ -53,9 +53,6 @@ class JuejinspiderSpider(scrapy.Spider):
     pages = 1
     # 先读取所有标，存入redis
     def start_requests(self):
-        # 模拟一个获取es数据的方法，如果获取不到就等待一会儿，然后在获取
-        r = requests.get("192.168.136.210:9200")
-
         urls = ['https://gold-tag-ms.juejin.im/v1/tags/type/hot/page/%s/pageSize/40' % (self.pages)]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse, headers=self.headers, dont_filter=True)
@@ -195,6 +192,8 @@ class JuejinspiderSpider(scrapy.Spider):
         # 文章链接
         article['link'] = response.url
 
+        # 文章标签
+        article['tags'] = response.css("#juejin > div.view-container > main > div > div.main-area.article-area.shadow > div.tag-list-box > div.tag-list > a > div.tag-title::text").extract()
         yield article
 
         # 将作者链接存入队列
