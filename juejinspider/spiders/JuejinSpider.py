@@ -128,7 +128,7 @@ class JuejinspiderSpider(scrapy.Spider):
         body = json.loads(response.body)
         if len(body['d']['entrylist']) > 0:
             for value in body['d']['entrylist']:
-                if "juejin.im/post" in value['originalUrl']:
+                if value != None and value['originalUrl']!= None and "juejin.im/post" in value['originalUrl']:
                     # 将文章的地址放入队列
                     yield scrapy.Request(url=value['originalUrl'], callback=self.parse, headers=self.headers,dont_filter=True)
 
